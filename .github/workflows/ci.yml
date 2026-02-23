@@ -1,4 +1,4 @@
-name: CI - Build Microservices Images
+name: CI - Build & Publish Online Boutique
 
 on:
   push:
@@ -9,17 +9,53 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         include:
 
-          - service: frontend
-            context: ./src/frontend
-            dockerfile: ./src/frontend/Dockerfile
+          # GO SERVICES
+          - service: adservice
+            context: ./src/adservice
+            dockerfile: ./src/adservice/Dockerfile
+
+          - service: currencyservice
+            context: ./src/currencyservice
+            dockerfile: ./src/currencyservice/Dockerfile
+
+          - service: emailservice
+            context: ./src/emailservice
+            dockerfile: ./src/emailservice/Dockerfile
+
+          - service: paymentservice
+            context: ./src/paymentservice
+            dockerfile: ./src/paymentservice/Dockerfile
 
           - service: productcatalogservice
             context: ./src/productcatalogservice
             dockerfile: ./src/productcatalogservice/Dockerfile
 
+          - service: recommendationservice
+            context: ./src/recommendationservice
+            dockerfile: ./src/recommendationservice/Dockerfile
+
+          - service: shippingservice
+            context: ./src/shippingservice
+            dockerfile: ./src/shippingservice/Dockerfile
+
+          - service: shoppingassistantservice
+            context: ./src/shoppingassistantservice
+            dockerfile: ./src/shoppingassistantservice/Dockerfile
+
+          - service: frontend
+            context: ./src/frontend
+            dockerfile: ./src/frontend/Dockerfile
+
+          # NODE SERVICE
+          - service: checkoutservice
+            context: ./src/checkoutservice
+            dockerfile: ./src/checkoutservice/Dockerfile
+
+          # .NET SERVICE
           - service: cartservice
             context: ./src/cartservice/src
             dockerfile: ./src/cartservice/src/Dockerfile
@@ -45,5 +81,6 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/online-boutique-${{ matrix.service }}:latest
+            ${{ secrets.DOCKER_USERNAME }}/online-boutique-${{ matrix.service }}:${{ github.sha }}
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/online-boutique-${{ matrix.service }}:latest
           cache-to: type=inline
