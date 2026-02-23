@@ -1,32 +1,36 @@
-name: CI - Docker Build and Push
+name: CI - Build Microservices Images
 
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
-  build-and-push:
+  build-images:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        service: [frontend, cartservice, productcatalogservice]
+
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Login to Docker Hub
+      - name: Login Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build frontend image
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/online-boutique-frontend:latest ./src/frontend
-
-      - name: Push frontend image
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/online-boutique-frontend:latest
+      - name: Build and Push ${{ matrix.service }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ./src/${{ matrix.service }}
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/online-boutique-${{ matrix.service }}:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/online-boutique-${{ matrix.service }}:latest
+          cache-to: type=inline
