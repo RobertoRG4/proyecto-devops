@@ -11,12 +11,19 @@ jobs:
     strategy:
       matrix:
         include:
+          # GO SERVICES (contexto local)
           - service: frontend
-            dockerfile: Dockerfile
-          - service: cartservice
-            dockerfile: src/Dockerfile
+            context: ./src/frontend
+            dockerfile: ./src/frontend/Dockerfile
+
           - service: productcatalogservice
-            dockerfile: Dockerfile
+            context: ./src/productcatalogservice
+            dockerfile: ./src/productcatalogservice/Dockerfile
+
+          # .NET SERVICE (contexto raíz)
+          - service: cartservice
+            context: .
+            dockerfile: ./src/cartservice/src/Dockerfile
 
     steps:
       - name: Checkout repository
@@ -34,8 +41,8 @@ jobs:
       - name: Build and Push ${{ matrix.service }}
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./src/${{ matrix.service }}/${{ matrix.dockerfile }}
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/online-boutique-${{ matrix.service }}:latest
