@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         include:
-          # GO SERVICES (contexto local)
+
           - service: frontend
             context: ./src/frontend
             dockerfile: ./src/frontend/Dockerfile
@@ -20,9 +20,8 @@ jobs:
             context: ./src/productcatalogservice
             dockerfile: ./src/productcatalogservice/Dockerfile
 
-          # .NET SERVICE (contexto raíz)
           - service: cartservice
-            context: .
+            context: ./src/cartservice
             dockerfile: ./src/cartservice/src/Dockerfile
 
     steps:
