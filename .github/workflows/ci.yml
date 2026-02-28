@@ -13,7 +13,6 @@ jobs:
       matrix:
         include:
 
-          # GO SERVICES
           - service: adservice
             context: ./src/adservice
             dockerfile: ./src/adservice/Dockerfile
@@ -50,12 +49,10 @@ jobs:
             context: ./src/frontend
             dockerfile: ./src/frontend/Dockerfile
 
-          # NODE SERVICE
           - service: checkoutservice
             context: ./src/checkoutservice
             dockerfile: ./src/checkoutservice/Dockerfile
 
-          # .NET SERVICE
           - service: cartservice
             context: ./src/cartservice/src
             dockerfile: ./src/cartservice/src/Dockerfile
@@ -79,6 +76,7 @@ jobs:
           context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
           push: true
+          platforms: linux/amd64
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/online-boutique-${{ matrix.service }}:latest
             ${{ secrets.DOCKER_USERNAME }}/online-boutique-${{ matrix.service }}:${{ github.sha }}
