@@ -1,16 +1,16 @@
-FROM node:20.20.0-alpine
+FROM node:20-alpine AS builder
 
-RUN apk add --no-cache \
-    python3 \
-    make \
-    g++
+RUN apk add --no-cache python3 make g++
 
 WORKDIR /usr/src/app
-
 COPY package*.json ./
-RUN npm install --only=production
+RUN npm ci --omit=dev
 
+FROM node:20-alpine
+
+WORKDIR /usr/src/app
+COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY . .
 
 EXPOSE 50051
-ENTRYPOINT [ "node", "index.js" ]
+ENTRYPOINT ["node","index.js"]
